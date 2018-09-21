@@ -1,0 +1,6 @@
+model_checkpoint_path: "model-4900"
+all_model_checkpoint_paths: "model-4500"
+all_model_checkpoint_paths: "model-4600"
+all_model_checkpoint_paths: "model-4700"
+all_model_checkpoint_paths: "model-4800"
+all_model_checkpoint_paths: "model-4900"
