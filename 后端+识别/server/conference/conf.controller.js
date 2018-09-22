@@ -1,6 +1,6 @@
 const Conf = require('./conf.model');
 const User = require('../user/user.model');
-
+var async = require('async');
 /**
  * Load conf and append to req.
  */
@@ -77,7 +77,14 @@ function create(req, res, next) {
       console.log('conf.participants: ' + conf.participants[1]);
       conf.participants.forEach((element) => {
         console.log(element);
-        User.update({ username: element }, { $addToSet: { recentConferences:  conf.id } }, function (err) {
+        User.update({ username: element }, { $addToSet: { recentConferences:  
+          { id: conf.id, 
+            timestamp: conf.timestamp, 
+            title: conf.title, 
+            author: conf.author,
+            status: conf.status,
+            participants: conf.participants
+          } } }, function (err) {
           if(err){
             res.send(500);
             console.log(err);
@@ -123,19 +130,78 @@ function update(req, res, next) {
   console.log(conf);
 
   // conf.attendedConference.append(req.body.connferenceName);
+  async.series(
+    [
+      function (done){
+        Conf.getById(conf.id)
+        .then((confOri) => {
+          console.log("1");
+          console.log("conf.id: ",conf.id)
+          console.log(confOri);
+          console.log(confOri[0].participants)
+          confOri[0].participants.forEach((participant) => {
+            User.update({ username: participant}, { $pull: { recentConferences: {id: conf.id} } }, function (err) {
+              if(err){
+                res.send(500);
+                console.log("err!: ",err);
+                done(err);
+              }else{done();}
+            });
 
-  Conf.remove({
-    id: conf.id
-  }, function (err) {
-    if (!err) {
-      console.log('"ok"');
-    } else {
-      console.log('"err"');
-    }
-  });
-  conf.save()
-    .then(savedConf => res.json(savedConf))
-    .catch(e => next(e));
+          }); 
+        });
+        
+      },
+      function (done){
+        console.log("2");
+        Conf.remove({
+          id: conf.id
+        }, function (err) {
+          if (!err) {
+            console.log('"ok"');
+            done();
+          } else {
+            console.log('"err"');
+            done(err);
+          }
+        });
+      },
+      function (done){
+        /*
+        conf.save()
+          .then(savedConf => res.json(savedConf))
+          .catch(e => next(e));
+          */
+        console.log("3");
+        conf.save()
+        .then((savedConf) => {
+          console.log(conf);
+          console.log('conf.participants: ' + conf.participants[0]);
+          conf.participants.forEach((element) => {
+            console.log(element);
+            User.update({ username: element }, { $addToSet: { recentConferences:  
+              {
+                id: conf.id, 
+                timestamp: conf.timestamp, 
+                title: conf.title, 
+                author: conf.author,
+                status: conf.status,
+                participants: conf.participants
+              } } }, function (err) {
+              if(err){
+                res.send(500);
+                console.log(err);
+              }
+            });
+          });
+          return res.json(savedConf);
+        })
+        .catch(e => next(e));
+        done();
+      }
+      
+    ]
+  );
 }
 
 /**
