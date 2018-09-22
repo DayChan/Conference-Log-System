@@ -105,7 +105,7 @@
 
         }
       }
-    },
+    },//
     mounted() {
       // The getUserMedia interface is used for handling camera input.
       // Some browsers need a prefix so here we're covering all the options
