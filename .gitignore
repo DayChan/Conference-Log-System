@@ -49,9 +49,6 @@ data
 # Optional REPL history
 .node_repl_history
 
-# .env
-.env
-
 # .rar .zip
 *.rar
 *.zip
