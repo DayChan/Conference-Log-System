@@ -11,6 +11,9 @@ const httpStatus = require('http-status');
 const APIError = require('../helpers/APIError');
 const config = require('../../config/config');
 
+function getLocalTime(nS) {     
+  return new Date(parseInt(nS) * 1000).toLocaleString().substr(0,17)
+}
 
 function handlePicsByUser(req, res, next) {
   // console.log(req);
@@ -166,7 +169,12 @@ function handlePicsByUser(req, res, next) {
 
 }
 
-
+/**
+ * ! 把user表中存的Conf改为conf_title
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 function handlePicsByConf(req, res, next) {
   const filePath = './image/takenFromCamera.png';
   const tiffPath = './image/takenFromCamera.tif';
@@ -280,32 +288,35 @@ function handlePicsByConf(req, res, next) {
                     Conf.getById(fieldid)
                       .then((conf) => {
                         console.log('1');
-                        console.log('conf: ' + conf);
-                        User.update({ username: user_name }, { $addToSet: { attendedConferences: conf } }, function(err) {
+                        console.log('conf: ' + conf);   //* 对user表加减conf
+                        User.update({ username: user_name }, { $addToSet: { attendedConferences: conf[0] } }, function(err) {
                           if(err){
                             console.log(err);
                           } else {
-                            console.log('2');
-                            User.update({ username: user_name }, { $pull: { recentConferences: conf[0].id } }, function(err) {
+                            console.log('2');     //! 测试
+                            User.update({ username: user_name }, { $pull: { recentConferences: {id:conf[0].id} } }, function(err) {
                               if(err) {
                                 console.log(err);
                               } else {
                                 console.log('3');
-                                User.getByName(user_name)
+                                User.getByName(user_name)   //* 对conf表加减user
                                   .then((user) => {
                                     console.log('4');
                                     console.log('user: ' + user);
-                                    Conf.update({ id: fieldid }, { $addToSet: { attendedStaff: user_name } }, function(err) {
+                                    var timestamp = Date.parse(new Date());
+                                    var timeNow = getLocalTime(timestamp);
+                                    console.log('timeNow: ' + timeNow);
+                                    Conf.update({ id: fieldid }, { $addToSet: { attendedStaff: {user_name, timeNow} } }, function(err) {
                                       if (err) {
                                         console.log(err);
-                                      } else {
+                                      } /* else {   
                                         console.log('5');
                                         Conf.update({ id: fieldid }, { $pull: { participants: user_name } }, function(err) {
                                           if (err) {
                                             console.log(err);
                                           }
-                                        });
-                                      }
+                                        }); //? 这是将username从conf participants中pull掉的操作，不知要不要加
+                                      }*/
                                     });
                                   }) 
                                   .catch(e => next(e));
@@ -385,6 +396,7 @@ function handlePicsByConf(req, res, next) {
   */
 }
 
+
 module.exports = {
   handlePicsByUser,
   handlePicsByConf
@@ -398,3 +410,9 @@ module.exports = {
 //     })
 //     .catch(e => next(e));
 // }
+
+/**
+ * TODO: 写一个结束会议识别签到的api
+ * TODO: 在数据库conf表加一项已离席人员
+ * handlepicsbyconfend
+ */

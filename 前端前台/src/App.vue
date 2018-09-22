@@ -224,6 +224,7 @@
             canvasContext.fillText('x: ' + x + 'px', x + width + 5, y + 11);
             canvasContext.fillText('y: ' + y + 'px', x + width + 5, y + 22);
           });
+          /*
           canvasContext.drawImage(video, x, y, width, height,x, y, width, height);
             var snapData = canvas.toDataURL('image/png');
               var imgSrc = "data:image/png;" + snapData;
@@ -240,9 +241,11 @@
               return new File([u8arr], filename, {
                 type: mime
               });
-            }
+            }//? 这是截取图片的代码，暂时注释掉
 
             var file = dataURLtoFile(imgSrc ,'try.png');
+            */
+           
             // let blob = new Blob(this.images, {
             //   type: "image/png"
             // });

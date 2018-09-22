@@ -5,6 +5,7 @@ const APIError = require('../helpers/APIError');
 
 /**
  * User Schema
+ * TODO:USER表中加一项图片路径
  */
 const UserSchema = new mongoose.Schema({
   id: {

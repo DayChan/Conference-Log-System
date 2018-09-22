@@ -5,6 +5,7 @@ const APIError = require('../helpers/APIError');
 
 /**
  * Conference Schema
+ * TODO: CONF表中加一项已离席
  */
 const ConferenceSchema = new mongoose.Schema({
   id: {
