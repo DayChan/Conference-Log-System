@@ -77,7 +77,7 @@ function create(req, res, next) {
       console.log('conf.participants: ' + conf.participants[1]);
       conf.participants.forEach((element) => {
         console.log(element);
-        User.update({ username: element }, { $addToSet: { recentConferences:  conf } }, function (err) {
+        User.update({ username: element }, { $addToSet: { recentConferences:  conf.id } }, function (err) {
           if(err){
             res.send(500);
             console.log(err);
