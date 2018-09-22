@@ -60,7 +60,7 @@
      <el-table-column align="center" :label="$t('table.roles')" border fit highlight-current-row
       style="width: 10%">
         <template slot-scope="scope">
-          <span>{{scope.row.roles[0]}}</span>
+          <span>{{scope.row.roles}}</span>
         </template>
       </el-table-column> 
       <el-table-column align="center" :label="$t('table.actions')" width="230" class-name="small-padding fixed-width">
@@ -88,13 +88,17 @@
           <el-input style="marginLeft:50px;" v-model="temp.mobileNumber"  placeholder="Please input"></el-input>
         </el-form-item>
         <el-form-item :label="$t('table.job')">
-          <el-input style="marginLeft:50px;" v-model="temp.job" placeholder="Please input"></el-input>
+          <el-select style="marginLeft:50px;" v-model="temp.job" class="filter-item" placeholder="Please select">
+            <el-option v-for="item in jobOptions" :key="item" :label="item" :value="item"/>
+          </el-select>
         </el-form-item>
         <el-form-item :label="$t('table.department')">
           <el-input style="marginLeft:50px;" v-model="temp.department" placeholder="Please input"></el-input>
         </el-form-item>
         <el-form-item :label="$t('table.roles')">
-          <el-input style="marginLeft:50px;" v-model="temp.roles" placeholder="Please input"></el-input>
+          <el-select style="marginLeft:50px;" v-model="temp.roles" class="filter-item" placeholder="Please select">
+            <el-option v-for="item in rolesOptions" :key="item" :label="item" :value="item"/>
+          </el-select>
         </el-form-item>         
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -155,7 +159,7 @@ export default {
         type: undefined,
         sort: '+id'
       },
-      importanceOptions: [1, 2, 3],
+      jobOptions: ['manager', 'coder'],
       rolesOptions: ['admin', 'editor'],
       calendarTypeOptions,
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
