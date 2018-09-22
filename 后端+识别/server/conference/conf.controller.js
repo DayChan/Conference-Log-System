@@ -144,12 +144,13 @@ function update(req, res, next) {
               if(err){
                 res.send(500);
                 console.log("err!: ",err);
-                done(err);
-              }else{done();}
+                
+              }else{}
             });
 
           }); 
         });
+        done();
         
       },
       function (done){
@@ -159,12 +160,13 @@ function update(req, res, next) {
         }, function (err) {
           if (!err) {
             console.log('"ok"');
-            done();
+            
           } else {
             console.log('"err"');
-            done(err);
+            //done(err);
           }
-        });
+        })
+        done();
       },
       function (done){
         /*
