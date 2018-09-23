@@ -107,13 +107,19 @@ function create(req, res, next) {
  * @property req
  */
 function createWithPic(req, res, next) {
+  console.log("startttt");
+  var form = new formidable.IncomingForm();
+  form.uploadDir = './faceReco_conference/Data/images_evaluation';                // 上传文件的保存路径
+  form.keepExtensions = true;                // 保存扩展名
+  form.maxFieldsSize = 20 * 1024 * 1024;     // 上传文件的最大大小
+  
   form.parse(req, function (err, fields, files) {
     if (err) {
       return console.log('formidable, form.parse err');
-    }
+    }                                        // 处理 request
     console.log('formidable, form.parse ok');
     console.log('显示上传时的参数 begin');
-    console.log(fields);
+    console.log("field:",fields);
     userId = fields.id;
     userName = fields.username;
     passWord = fields.password;
@@ -157,18 +163,19 @@ function createWithPic(req, res, next) {
       var extname = filename.lastIndexOf('.') >= 0 ?
         filename.slice(filename.lastIndexOf('.') - filename.length) :
         '';
-      
       if (extname === '' && type.indexOf('/') >= 0) {
-        extname = '.' + type.split('/')[1];  // 文件名没有扩展名时候，则从文件类型中取扩展名
-      }                                     
+        extname = '.' + type.split('/')[1];   // 文件名没有扩展名时候，则从文件类型中取扩展名
+      }              
+      filename = 'takenFromCamera.tif'        //先固定文件名 
+      fs.mkdirSync(path.join(form.uploadDir, userName));                  //创建用户名文件夹    
       var filenewpath = path.join(form.uploadDir, userName, filename);    // 构建将要存储的文件的路径
-      
+      console.log("filenewpath: ",filenewpath)
       fs.rename(tempfilepath, filenewpath, function (err) {
-        if (err) {                           // 将临时文件保存为正式的文件           
-          console.log('fs.rename err');      // 发生错误
+        if (err) {                            // 将临时文件保存为正式的文件           
+          console.log('fs.rename err');       // 发生错误
           result = 'error|save error';
         } else {
-          console.log('fs.rename done');     // 保存成功
+          console.log('fs.rename done');      // 保存成功
           res.send(200);
         }       
       });
@@ -242,4 +249,17 @@ function remove(req, res, next) {
     .catch(e => next(e));
 }
 
+function dataURLtoFile(dataurl, filename) {
+  var arr = dataurl.split(','),
+    mime = arr[0].match(/:(.*?);/)[1],
+    bstr = atob(arr[1]),
+    n = bstr.length,
+    u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, {
+    type: mime
+  });
+}
 module.exports = { loadById, loadByName, get, create, update, list, remove, getConfByName, createWithPic };

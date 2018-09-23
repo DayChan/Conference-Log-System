@@ -100,6 +100,7 @@ import LangSelect from '@/components/LangSelect'
 import SocialSign from './socialsignin'
 import ImageCropper from '@/components/ImageCropper'
 
+
 export default {
   components: { LangSelect, SocialSign, ImageCropper },
   name: 'login',
@@ -162,8 +163,22 @@ export default {
     }
   },
   methods: {
+    dataURLtoFile(dataurl, filename) {
+      var arr = dataurl.split(','),
+        mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]),
+        n = bstr.length,
+        u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new File([u8arr], filename, {
+        type: mime
+      });
+    },
     createData() {
       var form = this.signupForm;
+      var file = this.dataURLtoFile(this.image, 'takenFromCamera.png')
       // this.temp.author = 'vue-element-admin'
       var formdata = new FormData(); // 创建form对象
       formdata.append('id',form.id);
@@ -173,9 +188,9 @@ export default {
       formdata.append('roles',form.roles);
       formdata.append('department',form.department);
       formdata.append('job',form.job);
-      formdata.append('', this.image); // 通过append向form对象添加数据,可以通过append继续添加数据或formdata.append('img',file)
-      console.log(this.image)
-      console.log(formdata)
+      formdata.append('', file); // 通过append向form对象添加数据,可以通过append继续添加数据或formdata.append('img',file)
+      //console.log(this.image)
+      //console.log(formdata)
       let config = {
               headers: {
                 'enctype': 'multipart/form-data'
