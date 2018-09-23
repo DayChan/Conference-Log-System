@@ -67,13 +67,25 @@ export default {
   login: {
     title: '系统登录',
     logIn: '登录',
-    username: '账号',
+    username: '用户名',
     password: '密码',
     any: '随便填',
     thirdpartyTips: '本地不能模拟，请结合自己业务进行模拟！！！',
+    signUp: '注册'
+  },
+  signup: {
+    logIn: '登录',
+    username: '用户名',
+    password: '密码',
     signUp: '注册',
     confirm: '确认',
-    id: 'id'
+    id: '员工号',
+    language: 'language',
+    mobileNumber: '电话号码',
+    job: '职业',
+    department: '部门',
+    avator: '头像',
+    uploadAvator: '上传头像'
   },
   documentation: {
     documentation: '文档',

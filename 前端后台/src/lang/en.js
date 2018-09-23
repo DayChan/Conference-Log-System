@@ -72,9 +72,21 @@ export default {
     any: 'any',
     thirdparty: 'Or connect with',
     thirdpartyTips: 'Can not be simulated on local, so please combine you own business simulation! ! !',
+    signUp: 'Sign up'
+  },
+  signup: {
+    logIn: 'Log in',
+    username: 'Username',
+    password: 'Password',
     signUp: 'Sign up',
     confirm: 'Confirm',
-    id: 'id'
+    id: 'Id',
+    language: '语言',
+    mobileNumber: 'MobileNumber',
+    job: 'Job',
+    department: 'Department',
+    avator: 'Avator',
+    uploadAvator: 'Upload Avator'
   },
   documentation: {
     documentation: 'Documentation',

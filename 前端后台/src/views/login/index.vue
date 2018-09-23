@@ -27,48 +27,66 @@
       <br>
       <br>
       <br>
-
-   
-
-      <el-button class="thirdparty-button" style="width:20%;margin-bottom:20px;" type="primary" @click="showDialog=true">{{$t('login.signUp')}}</el-button>
+      <el-button class="thirdparty-button" style="width:20%;margin-bottom:20px;" type="primary" @click="showDialog=true">{{$t('signup.signUp')}}</el-button>
     </el-form>
 
-    <el-dialog :title="$t('login.signUp')" :visible.sync="showDialog" append-to-body>
-      <el-form class="login-form" autoComplete="on" :model="loginForm" :rules="loginRules" ref="loginForm" label-position="left">
-        <div class="title-container">
-         <lang-select class="set-language"></lang-select>{{"language"}}
+    <el-dialog :title="$t('signup.signUp')" :visible.sync="showDialog" append-to-body>
+      <el-form  class="login-form" autoComplete="on" :model="signupForm" :rules="signupRules" ref="signupForm" label-position="left" label-width="200px">
+        <div class="title-container" align="right">
+         <lang-select  class="set-language"></lang-select>{{$t('signup.language')}}
         </div>
 
-        <el-form-item :label="$t('login.id')"prop="password">
-          <span class="svg-container">
-            <svg-icon icon-class="password" />
-          </span>
-          <el-input name="password" style="width:35%;margin-bottom:30px;" :type="passwordType" @keyup.enter.native="handleLogin" v-model="loginForm.password" autoComplete="on" placeholder="Please input your password" />
-          <span class="show-pwd" @click="showPwd">
-            <svg-icon icon-class="eye" />
-          </span>
+        <el-form-item style="margin-left:100px;" :label="$t('signup.id')" prop="id">
+          <el-input style="width:50%;" v-model="signupForm.id"  placeholder="Please input"></el-input>
         </el-form-item>
 
-        <el-form-item :label="$t('login.username')" prop="username">
-          <span class="svg-container svg-container_login">
-           <svg-icon icon-class="user" />
-         </span>
-         <el-input name="username" style="width:35%;margin-bottom:30px;" :type="text" v-model="loginForm.username" autoComplete="on" placeholder="Please input your username" />
+        <el-form-item style="margin-left:100px;"  :label="$t('signup.username')" prop="username">
+         <el-input style="width:50%;" v-model="signupForm.username"  placeholder="Please input"></el-input>
         </el-form-item>
 
-      <el-form-item :label="$t('login.password')"prop="password">
-        <span class="svg-container">
-          <svg-icon icon-class="password" />
-        </span>
-        <el-input name="password" style="width:35%;margin-bottom:30px;" :type="passwordType" @keyup.enter.native="handleLogin" v-model="loginForm.password" autoComplete="on" placeholder="Please input your password" />
+        <el-form-item style="margin-left:100px;" :label="$t('signup.password')" prop="password">
+        <el-input style="width:50%;" :type="passwordType" @keyup.enter.native="handleLogin" v-model="signupForm.password" autoComplete="on" placeholder="Please input" />
         <span class="show-pwd" @click="showPwd">
           <svg-icon icon-class="eye" />
         </span>
-      </el-form-item>
+        </el-form-item>
 
-      <el-button type="primary" style="width:100%;margin-bottom:30px;" :loading="loading" @click.native.prevent="handleLogin">{{$t('login.confirm')}}</el-button>
-    </el-form>
-      <social-sign />
+        <el-form-item style="margin-left:100px;" :label="$t('signup.mobileNumber')" prop="mobileNumber">
+          <el-input style="width:50%;" v-model="signupForm.mobileNumber"  placeholder="Please input"></el-input>
+        </el-form-item>
+
+        <el-form-item style="margin-left:100px;" :label="$t('signup.job')" prop="job">
+          <el-select style="width:50%;" v-model="signupForm.job" class="filter-item" placeholder="Please select">
+            <el-option v-for="item in jobOptions" :key="item" :label="item" :value="item"/>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item style="margin-left:100px;" :label="$t('signup.department')" prop="department">
+          <el-select style="width:50%;" v-model="signupForm.department" class="filter-item" placeholder="Please select">
+            <el-option v-for="item in departOptions" :key="item" :label="item" :value="item"/>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item style="margin-left:100px;" :label="$t('signup.avator')" prop="avator">
+          <el-button type="primary" icon="upload" style="width:50%;margin-left;" @click="imagecropperShow=true">{{ $t('signup.uploadAvator') }}
+        </el-button>
+        <image-cropper
+           v-show="imagecropperShow"
+          :width="300"
+          :height="300"
+          :key="imagecropperKey"
+          url="https://httpbin.org/post"
+          lang-type="en"
+          @close="close"
+          @crop-upload-success="cropSuccess"/>
+        </el-form-item>
+
+        <div style = "text-align:center;">
+        <el-button type="primary" style="width:50%;margin-top:30px;" @click="dialogPvVisible = false">{{ $t('signup.confirm') }}
+        </el-button>
+        </div>
+      
+      </el-form>
     </el-dialog>
 
   </div>
@@ -78,9 +96,10 @@
 import { isvalidUsername } from '@/utils/validate'
 import LangSelect from '@/components/LangSelect'
 import SocialSign from './socialsignin'
+import ImageCropper from '@/components/ImageCropper'
 
 export default {
-  components: { LangSelect, SocialSign },
+  components: { LangSelect, SocialSign, ImageCropper },
   name: 'login',
   data() {
     const validateUsername = (rule, value, callback) => {
@@ -97,6 +116,13 @@ export default {
         callback()
       }
     }
+    const validateMobileNumber = (rule, value, callback) => {
+      if (value.length != 11) {
+        callback(new Error('The mobile number should be 11 digits'))
+      } else {
+        callback()
+      }
+    }
     return {
       loginForm: {
         username: 'Hiro',
@@ -106,12 +132,61 @@ export default {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
+      signupForm: {
+        id: undefined,
+        username: null,
+        password: null,
+        job: null,
+        department: null,
+        roles: null,
+        mobileNumber: null
+      },
+      signupRules:{
+        id: [{required: true, trigger: 'blur'}],
+        username: [{required: true, trigger: 'blur', validator: validateUsername }],
+        password: [{required: true, trigger: 'blur', validator: validatePassword }],
+        mobileNumber: [{required: true, trigger: 'blur', validator: validateMobileNumber}],
+        job: [{required: true, trigger: 'blur'}],
+        department: [{required: true, trigger: 'blur'}],
+        avator: [{required: true, trigger: 'blur'}]
+      },
+      jobOptions: ['manager', 'coder'],
+      departOptions: ['Strelizia','Delphinium','Argentea','Genista','Chlorophytum'],
       passwordType: 'password',
       loading: false,
-      showDialog: false
+      showDialog: false,
+      imagecropperShow: false,
+      imagecropperKey: 0
     }
   },
   methods: {
+    createData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          var form = this.signupForm;
+          // this.temp.author = 'vue-element-admin'
+          var formdata = new FormData(); // 创建form对象
+          formdata.append('id',form.id);
+          formdata.append('username',form.username);
+          formdata.append('password',form.password);
+          formdata.append('mobileNumber',form.mobileNumber);
+          formdata.append('roles',form.roles);
+          formdata.append('department',form.department);
+          formdata.append('job',form.job);
+          formdata.append('', this.image); // 通过append向form对象添加数据,可以通过append继续添加数据或formdata1.append('img',file)
+          createUserWithPic(this.temp).then(() => {
+            this.list.unshift(this.temp)
+            this.dialogFormVisible = false
+            this.$notify({
+              title: '成功',
+              message: '创建成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
     showPwd() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
@@ -152,6 +227,14 @@ export default {
       //     this.$router.push({ path: '/' })
       //   })
       // }
+    },
+    cropSuccess(resData) {
+      this.imagecropperShow = false
+      this.imagecropperKey = this.imagecropperKey + 1
+      this.image = resData.files.avatar
+    },
+    close() {
+      this.imagecropperShow = false
     }
   },
   created() {
@@ -162,6 +245,14 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  .avatar{
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+  }
+</style>
 
 <style rel="stylesheet/scss" lang="scss">
 $bg:#2d3a4b;

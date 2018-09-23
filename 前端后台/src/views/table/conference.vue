@@ -209,7 +209,6 @@ export default {
       this.listLoading = true
       getConfsByName(this.name).then(response => {
         this.list = response.data[0].recentConferences
-        console.log(response.data[0].recentConferences)
         this.listLoading = false
       })
     },
@@ -363,7 +362,6 @@ export default {
     handleParticipants(id) {
       fetchArticle(id).then(response => {
         this.paData = response.data[0].participants
-        console.log(this.paData)
         this.dialogPaVisible = true
       })
     },
