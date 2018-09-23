@@ -118,7 +118,7 @@ function createWithPic(req, res, next) {
     userName = fields.username;
     passWord = fields.password;
     roles = fields.roles;
-    mobileNumber = fields.mobilenumber;
+    mobileNumber = fields.mobileNumber;
     department = fields.department;
     job = fields.job;
 
