@@ -40,6 +40,9 @@ const ConferenceSchema = new mongoose.Schema({
   },
   status: {
     type: String
+  },
+  haveLeftStaff: {
+    type: Array
   }
 });
 

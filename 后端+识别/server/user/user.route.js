@@ -31,5 +31,7 @@ router.route('/detail')
 router.route('/confs')
   .post(userCtrl.getConfByName);
 
+router.route('/createWithPic')
+  .post(userCtrl.createWithPic);
 
 module.exports = router;

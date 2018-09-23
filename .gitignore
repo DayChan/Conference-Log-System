@@ -53,3 +53,6 @@ data
 *.zip
 # .docx
 *.docx
+
+#takenfromcamera
+*takenFromCamera*

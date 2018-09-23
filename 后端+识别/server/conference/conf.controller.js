@@ -147,10 +147,10 @@ function update(req, res, next) {
                 
               }else{}
             });
-
-          }); 
+          });
+          done(); 
         });
-        done();
+        
         
       },
       function (done){
@@ -160,13 +160,13 @@ function update(req, res, next) {
         }, function (err) {
           if (!err) {
             console.log('"ok"');
-            
+            done();
           } else {
             console.log('"err"');
             //done(err);
           }
         })
-        done();
+       
       },
       function (done){
         /*
