@@ -245,7 +245,7 @@
 
             var file = dataURLtoFile(imgSrc ,'try.png');
             */
-           
+
             // let blob = new Blob(this.images, {
             //   type: "image/png"
             // });
