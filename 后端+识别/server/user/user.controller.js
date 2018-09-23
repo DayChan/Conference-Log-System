@@ -1,5 +1,14 @@
 const User = require('./user.model');
-
+const formidable = require('formidable');
+const path = require('path');
+const fs = require('fs');
+const spawnSync = require('child_process').spawnSync;
+const spawn = require('child_process').spawn;
+const execFileSync = require('child_process').execFileSync;
+var async = require('async');
+const httpStatus = require('http-status');
+const APIError = require('../helpers/APIError');
+const config = require('../../config/config');
 /**
  * Load user and append to req.
  */
@@ -94,6 +103,81 @@ function create(req, res, next) {
 }
 
 /**
+ * Enroll with pic. (Enroll on the log in page.)
+ * @property req
+ */
+function createWithPic(req, res, next) {
+  form.parse(req, function (err, fields, files) {
+    if (err) {
+      return console.log('formidable, form.parse err');
+    }
+    console.log('formidable, form.parse ok');
+    console.log('显示上传时的参数 begin');
+    console.log(fields);
+    userId = fields.id;
+    userName = fields.username;
+    passWord = fields.password;
+    roles = fields.roles;
+    mobileNumber = fields.mobilenumber;
+    department = fields.department;
+    job = fields.job;
+
+    const user = new User({
+      id: userId,
+      username: userName,
+      password: passWord,
+      roles: roles,
+      mobileNumber: mobileNumber,
+      department: department,
+      job: job
+    });
+
+    console.log("user: ")
+    console.log(user);
+
+    user.save()
+    .then(savedUser => res.json(savedUser))
+    .catch(e => next(e));
+
+    console.log('显示上传时的参数 end');
+    var item;
+    var length = 0;                           // 计算 files 长度
+    for (item in files) {
+      length++;
+    }
+    if (length === 0) {
+      console.log('files no data');
+      return;
+    }
+    for (item in files) {
+      var file = files[item];                 // formidable 会将上传的文件存储为一个临时文件，现在获取这个文件的目录       
+      var tempfilepath = file.path;           
+      var type = file.type;                   // 获取文件类型
+      var filename = file.name;               // 获取文件名，并根据文件名获取扩展名
+      var extname = filename.lastIndexOf('.') >= 0 ?
+        filename.slice(filename.lastIndexOf('.') - filename.length) :
+        '';
+      
+      if (extname === '' && type.indexOf('/') >= 0) {
+        extname = '.' + type.split('/')[1];  // 文件名没有扩展名时候，则从文件类型中取扩展名
+      }                                     
+      var filenewpath = path.join(form.uploadDir, userName, filename);    // 构建将要存储的文件的路径
+      
+      fs.rename(tempfilepath, filenewpath, function (err) {
+        if (err) {                           // 将临时文件保存为正式的文件           
+          console.log('fs.rename err');      // 发生错误
+          result = 'error|save error';
+        } else {
+          console.log('fs.rename done');     // 保存成功
+          res.send(200);
+        }       
+      });
+    }
+  });
+}
+
+
+/**
  * Update existing user
  * @property {Number} req.body.id - The id of user.
  * @property {String} req.body.username - The username of user.
@@ -158,4 +242,4 @@ function remove(req, res, next) {
     .catch(e => next(e));
 }
 
-module.exports = { loadById, loadByName, get, create, update, list, remove, getConfByName };
+module.exports = { loadById, loadByName, get, create, update, list, remove, getConfByName, createWithPic };
