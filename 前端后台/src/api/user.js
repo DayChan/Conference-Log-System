@@ -29,6 +29,14 @@ export function updateUser(data) {
   })
 }
 
+export function createUserWithPic(data) {
+  return request({
+    url: '/users/createWithPic',
+    method: 'post',
+    data
+  })
+}
+
 export function getConfsByName(name) {
   const data = {
     username: name

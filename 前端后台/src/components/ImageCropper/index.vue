@@ -819,13 +819,18 @@ export default {
       that.reset()
       that.loading = 1
       that.setStep(3)
+      var resData = createImgUrl;
+      that.loading = 2;
+      that.$emit('crop-upload-success', resData);
+      /*
       request({
-        url,
+        url: "localhost",
         method: 'post',
         data: fmData
       }).then(resData => {
+        resData = fmData
         that.loading = 2
-        that.$emit('crop-upload-success', resData.data)
+        that.$emit('crop-upload-success', resData)
       }).catch(err => {
         if (that.value) {
           that.loading = 3
@@ -833,7 +838,7 @@ export default {
           that.errorMsg = lang.fail
           that.$emit('crop-upload-fail', err, field, ki)
         }
-      })
+      })*/
     }
   },
   created() {

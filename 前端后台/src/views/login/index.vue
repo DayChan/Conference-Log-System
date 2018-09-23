@@ -82,7 +82,7 @@
         </el-form-item>
 
         <div style = "text-align:center;">
-        <el-button type="primary" style="width:50%;margin-top:30px;" @click="dialogPvVisible = false">{{ $t('signup.confirm') }}
+        <el-button type="primary" style="width:50%;margin-top:30px;" @click="createData">{{ $t('signup.confirm') }}
         </el-button>
         </div>
       
@@ -93,6 +93,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+import createUserWithPic from '@/api/user'
 import { isvalidUsername } from '@/utils/validate'
 import LangSelect from '@/components/LangSelect'
 import SocialSign from './socialsignin'
@@ -133,13 +135,13 @@ export default {
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       signupForm: {
-        id: undefined,
-        username: null,
-        password: null,
-        job: null,
-        department: null,
-        roles: null,
-        mobileNumber: null
+        id: '122',
+        username: 'wwwwwww',
+        password: '111111',
+        job: 'coder',
+        department: 'Delphinium',
+        roles: 'editor',
+        mobileNumber: '11111111111'
       },
       signupRules:{
         id: [{required: true, trigger: 'blur'}],
@@ -148,7 +150,7 @@ export default {
         mobileNumber: [{required: true, trigger: 'blur', validator: validateMobileNumber}],
         job: [{required: true, trigger: 'blur'}],
         department: [{required: true, trigger: 'blur'}],
-        avator: [{required: true, trigger: 'blur'}]
+        //avator: [{required: true, trigger: 'blur'}]
       },
       jobOptions: ['manager', 'coder'],
       departOptions: ['Strelizia','Delphinium','Argentea','Genista','Chlorophytum'],
@@ -161,31 +163,49 @@ export default {
   },
   methods: {
     createData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          var form = this.signupForm;
-          // this.temp.author = 'vue-element-admin'
-          var formdata = new FormData(); // 创建form对象
-          formdata.append('id',form.id);
-          formdata.append('username',form.username);
-          formdata.append('password',form.password);
-          formdata.append('mobileNumber',form.mobileNumber);
-          formdata.append('roles',form.roles);
-          formdata.append('department',form.department);
-          formdata.append('job',form.job);
-          formdata.append('', this.image); // 通过append向form对象添加数据,可以通过append继续添加数据或formdata1.append('img',file)
-          createUserWithPic(this.temp).then(() => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '创建成功',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
+      var form = this.signupForm;
+      // this.temp.author = 'vue-element-admin'
+      var formdata = new FormData(); // 创建form对象
+      formdata.append('id',form.id);
+      formdata.append('username',form.username);
+      formdata.append('password',form.password);
+      formdata.append('mobileNumber',form.mobileNumber);
+      formdata.append('roles',form.roles);
+      formdata.append('department',form.department);
+      formdata.append('job',form.job);
+      formdata.append('', this.image); // 通过append向form对象添加数据,可以通过append继续添加数据或formdata.append('img',file)
+      console.log(this.image)
+      console.log(formdata)
+      let config = {
+              headers: {
+                'enctype': 'multipart/form-data'
+              },
+              processData: false,
+              contentType: false,
+            };
+      axios.post('http://localhost:4041/api/users/createWithPic', formdata, config).then((response) =>{
+        console.log("res: " + response)
+        this.showDialog = false
+        this.$notify({
+          title: '成功',
+          message: '创建成功',
+          type: 'success',
+          duration: 2000
+        })
       })
+      /*
+      createUserWithPic(formdata).then(() => {
+        //this.list.unshift(formdata)
+        console.log("111111111111")
+        showDialog = false
+        this.$notify({
+          title: '成功',
+          message: '创建成功',
+          type: 'success',
+          duration: 2000
+        })
+      })
+      */
     },
     showPwd() {
       if (this.passwordType === 'password') {
@@ -231,7 +251,8 @@ export default {
     cropSuccess(resData) {
       this.imagecropperShow = false
       this.imagecropperKey = this.imagecropperKey + 1
-      this.image = resData.files.avatar
+      this.image = resData //.files.avatar
+      //console.log("image: ",this.image);
     },
     close() {
       this.imagecropperShow = false
