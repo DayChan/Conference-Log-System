@@ -34,9 +34,11 @@
     <div class="content-cam">
       <div class="camera-wrp sec">
         <video width="640" height="480" id="video_cam" preload autoplay loop muted></video>
+        
         <canvas width="640" height="480" id="face_detect"></canvas>
         <label v-if="trackTracking" class="checkbox activate-autocapture">
-          <input type="checkbox" v-model="autoCaptureTrackTraking"> auto capture is {{autoCaptureTrackTraking ? 'activated' : 'not activated'}}
+          <input type="checkbox" v-model="autoCaptureTrackTraking"> auto capture is {{autoCaptureTrackTraking ?
+          'activated' : 'not activated'}}
         </label>
         <div class="control-btn">
           <div class="btn-wrp">
@@ -85,6 +87,7 @@
     isEmpty
   } from 'lodash';
   import axios from 'axios';
+  import cropper from 'cropperjs';
 
 
   export default {
@@ -105,7 +108,7 @@
 
         }
       }
-    },////
+    }, ////
     mounted() {
       // The getUserMedia interface is used for handling camera input.
       // Some browsers need a prefix so here we're covering all the options
@@ -192,14 +195,14 @@
         }
       },
       onTrackTracking() {
-        const context = this;
+         const context = this;
         const video = this.$el.querySelector('#video_cam');
-        const canvas = this.$el.querySelector('#face_detect');
-        const canvasContext = canvas.getContext('2d');
+         const canvas = this.$el.querySelector('#face_detect');
+         const canvasContext = canvas.getContext('2d');
         let tracker = new tracking.ObjectTracker('face');
 
         video.pause();
-        video.src = '';
+        //video.src = '';
         tracker.setInitialScale(4);
         tracker.setStepSize(2);
         tracker.setEdgesDensity(0.1);
@@ -223,11 +226,30 @@
             canvasContext.fillStyle = "#fff";
             canvasContext.fillText('x: ' + x + 'px', x + width + 5, y + 11);
             canvasContext.fillText('y: ' + y + 'px', x + width + 5, y + 22);
-          });
-          /*
-          canvasContext.drawImage(video, x, y, width, height,x, y, width, height);
-            var snapData = canvas.toDataURL('image/png');
-              var imgSrc = "data:image/png;" + snapData;
+
+            //canvasContext.clearRect(0, 0, width, height);
+
+            canvasContext.drawImage(video, x, y, width, height, x, y, width, width);
+            var imageData = canvasContext.getImageData(x, y, width, height);
+
+            var cas = document.createElement('canvas');
+            cas.width = width;
+            cas.height = height;
+            var casContext = cas.getContext('2d');
+            casContext.putImageData(imageData,0,0);
+
+
+            
+            
+
+            
+
+            //cropper.getCroppedCanvas();
+
+
+
+            var snapData = cas.toDataURL('image/png');
+            var imgSrc = "data:image/png;" + snapData;
 
             function dataURLtoFile(dataurl, filename) {
               var arr = dataurl.split(','),
@@ -241,11 +263,11 @@
               return new File([u8arr], filename, {
                 type: mime
               });
-            }//? 这是截取图片的代码，暂时注释掉
+            }
 
-            var file = dataURLtoFile(imgSrc ,'try.png');
-            */
-           
+            var file = dataURLtoFile(imgSrc, 'takenFromCamera.png');
+
+
             // let blob = new Blob(this.images, {
             //   type: "image/png"
             // });
@@ -269,6 +291,11 @@
             axios.post('http://localhost:4041/api/reco/user', formdata1, config).then(response => { //这里的/xapi/upimage为接口
               console.log(response.data);
             })
+
+          });
+
+
+
 
           if (!isEmpty(event.data) && autoCaptureTrackTraking) {
             context.onTakeCam();
@@ -345,7 +372,7 @@
               contentType: false,
 
             }; //添加请求头
-            
+
             axios.post('http://localhost:4041/api/reco/user', formdata1, config).then(response => { //这里的/xapi/upimage为接口
               console.log(response.data);
               console.log('fuck')
@@ -466,9 +493,11 @@
 
   #app {
     padding: 1.5rem;
+
     h1 {
       text-align: center;
     }
+
     .content-cam {
       .sec:not(:last-child) {
         margin-bottom: 1.5rem;
@@ -484,6 +513,7 @@
     overflow: auto;
     position: relative;
     padding: 1rem;
+
     .img-item {
       background-size: cover;
       background-position: center;
@@ -500,19 +530,24 @@
     @include fl_col;
     align-items: center;
     position: relative;
+
     video {
       margin-bottom: 1.5rem;
     }
+
     .control-btn {
       @include fl_row;
       width: 100%;
+
       .btn-wrp {
         a {
           span {
             margin-left: 1rem;
           }
+
           min-width: 150px;
         }
+
         text-align: center;
         flex: 1;
       }
@@ -559,6 +594,7 @@
       top: -300px;
       opacity: 0
     }
+
     to {
       top: 0;
       opacity: 1
@@ -570,6 +606,7 @@
       top: -300px;
       opacity: 0
     }
+
     to {
       top: 0;
       opacity: 1
