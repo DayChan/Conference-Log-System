@@ -10,12 +10,16 @@ router.route('/conf')
   .post(recoCtrl.handlePicsByConf);
 router.param('confId', recoCtrl.handlePicsByConf);
 
+router.route('/confEnd')
+  /** POST /api/reco - Upload Pics */
+  .post(recoCtrl.handlePicsByConfEnd);
+
 router.route('/user')
   /** POST /api/reco - Upload Pics */
   .post(recoCtrl.handlePicsByUser);
 router.param('userId', recoCtrl.handlePicsByUser);
 
 /**
- * TODO: 写一个confend路由
+ * TODO: 写一个confend路由 OK
  */
 module.exports = router;
