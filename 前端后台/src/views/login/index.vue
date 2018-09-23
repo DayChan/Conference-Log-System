@@ -30,14 +30,44 @@
 
    
 
-      <el-button class="thirdparty-button" type="primary" @click="showDialog=true">{{$t('login.thirdparty')}}</el-button>
+      <el-button class="thirdparty-button" style="width:20%;margin-bottom:20px;" type="primary" @click="showDialog=true">{{$t('login.signUp')}}</el-button>
     </el-form>
 
-    <el-dialog :title="$t('login.thirdparty')" :visible.sync="showDialog" append-to-body>
-      {{$t('login.thirdpartyTips')}}
-      <br/>
-      <br/>
-      <br/>
+    <el-dialog :title="$t('login.signUp')" :visible.sync="showDialog" append-to-body>
+      <el-form class="login-form" autoComplete="on" :model="loginForm" :rules="loginRules" ref="loginForm" label-position="left">
+        <div class="title-container">
+         <lang-select class="set-language"></lang-select>{{"language"}}
+        </div>
+
+        <el-form-item :label="$t('login.id')"prop="password">
+          <span class="svg-container">
+            <svg-icon icon-class="password" />
+          </span>
+          <el-input name="password" style="width:35%;margin-bottom:30px;" :type="passwordType" @keyup.enter.native="handleLogin" v-model="loginForm.password" autoComplete="on" placeholder="Please input your password" />
+          <span class="show-pwd" @click="showPwd">
+            <svg-icon icon-class="eye" />
+          </span>
+        </el-form-item>
+
+        <el-form-item :label="$t('login.username')" prop="username">
+          <span class="svg-container svg-container_login">
+           <svg-icon icon-class="user" />
+         </span>
+         <el-input name="username" style="width:35%;margin-bottom:30px;" :type="text" v-model="loginForm.username" autoComplete="on" placeholder="Please input your username" />
+        </el-form-item>
+
+      <el-form-item :label="$t('login.password')"prop="password">
+        <span class="svg-container">
+          <svg-icon icon-class="password" />
+        </span>
+        <el-input name="password" style="width:35%;margin-bottom:30px;" :type="passwordType" @keyup.enter.native="handleLogin" v-model="loginForm.password" autoComplete="on" placeholder="Please input your password" />
+        <span class="show-pwd" @click="showPwd">
+          <svg-icon icon-class="eye" />
+        </span>
+      </el-form-item>
+
+      <el-button type="primary" style="width:100%;margin-bottom:30px;" :loading="loading" @click.native.prevent="handleLogin">{{$t('login.confirm')}}</el-button>
+    </el-form>
       <social-sign />
     </el-dialog>
 
