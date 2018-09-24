@@ -47,7 +47,7 @@ export default {
       this.chart = echarts.init(document.getElementById(this.id))
       const xData = (function() {
         const data = []
-        data.push('January ')
+        data.push('January')
         data.push('February')
         data.push('March')
         data.push('April ')
