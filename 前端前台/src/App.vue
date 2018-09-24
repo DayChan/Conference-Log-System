@@ -292,7 +292,8 @@
               casContext.putImageData(imageData, 0, 0);
 
               var snapData = cas.toDataURL('image/png');
-              var imgSrc = "data:image/png;" + snapData;
+              that.images.push(snapData);
+              //var imgSrc = "data:image/png;" + snapData;
 
               function dataURLtoFile(dataurl, filename) {
                 var arr = dataurl.split(','),
@@ -308,7 +309,7 @@
                 });
               }
 
-              var file = dataURLtoFile(imgSrc, 'takenFromCamera.png');
+              var file = dataURLtoFile(snapData, 'takenFromCamera.png');
 
 
               // let blob = new Blob(this.images, {
@@ -319,9 +320,9 @@
               // });
 
               // let file = images[0];
-              var formdata1 = new FormData(); // 创建form对象
-              formdata1.append('id', that.selectedConfs[0]);
-              formdata1.append('', file); // 通过append向form对象添加数据,可以通过append继续添加数据或formdata1.append('img',file)
+              var formdata2 = new FormData(); // 创建form对象
+              formdata2.append('id', that.selectedConfs[0]);
+              formdata2.append('', file); // 通过append向form对象添加数据,可以通过append继续添加数据或formdata1.append('img',file)
               let config = {
 
                 headers: {
@@ -334,8 +335,8 @@
 
 
               //进场刷脸
-              if (beginToSignIn & !beginToSignOut) {
-                axios.post('http://localhost:4041/api/reco/conf', formdata1, config).then(response => { //这里的/xapi/upimage为接口
+              if (beginToSignIn && !beginToSignOut) {
+                axios.post('http://localhost:4041/api/reco/conf', formdata2, config).then(response => { //这里的/xapi/upimage为接口
                   console.log(response.data);
                   that.username = response.data[0].username;
 
@@ -354,8 +355,8 @@
               }
 
               //退场刷脸
-              else if (!beginToSignIn & beginToSignOut) {
-                axios.post('http://localhost:4041/api/reco/confEnd', formdata1, config).then(response => { //这里的/xapi/upimage为接口
+              else if (!beginToSignIn && beginToSignOut) {
+                axios.post('http://localhost:4041/api/reco/confEnd', formdata2, config).then(response => { //这里的/xapi/upimage为接口
                   console.log(response.data);
 
                   that.username = response.data[0].username;
@@ -443,7 +444,7 @@
 
 
           //管理员的两次刷脸，要点按钮拍照
-          if (!beginToSignIn & !beginToSignOut & this.buttonName1 == '开始签到') {
+          if (!beginToSignIn && !beginToSignOut && this.buttonName1 == '开始签到') {
             console.log('sign in1:' + beginToSignIn);
             console.log('sign out1:' + beginToSignOut);
             var file = dataURLtoFile(image, 'takenFromCamera.png');
@@ -526,7 +527,7 @@
 
 
           // } 
-          else if (!beginToSignIn & !beginToSignOut & this.buttonName3 == 'Done') {
+          else if (!beginToSignIn && !beginToSignOut && this.buttonName3 == 'Done') {
             console.log('sign in3:' + beginToSignIn);
             console.log('sign out3:' + beginToSignOut);
 
