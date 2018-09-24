@@ -136,13 +136,13 @@ export default {
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       signupForm: {
-        id: '122',
-        username: 'wwwwwww',
-        password: '111111',
-        job: 'coder',
-        department: 'Delphinium',
-        roles: 'editor',
-        mobileNumber: '11111111111'
+        id: null,
+        username: null,
+        password:null,
+        job: null,
+        department: null,
+        roles: null,
+        mobileNumber: null
       },
       signupRules:{
         id: [{required: true, trigger: 'blur'}],

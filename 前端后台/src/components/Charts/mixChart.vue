@@ -47,9 +47,21 @@ export default {
       this.chart = echarts.init(document.getElementById(this.id))
       const xData = (function() {
         const data = []
-        for (let i = 1; i < 13; i++) {
-          data.push(i + 'month')
-        }
+        data.push('January ')
+        data.push('February')
+        data.push('March')
+        data.push('April ')
+        data.push('May')
+        data.push('June')
+        data.push('July')
+        data.push('August')
+        data.push('September ')
+        data.push('October')
+        data.push('November')
+        data.push('December ')
+        // for (let i = 1; i < 13; i++) {
+        //   data.push(i + 'month')
+        // }
         return data
       }())
       this.chart.setOption({
@@ -89,7 +101,7 @@ export default {
           textStyle: {
             color: '#90979c'
           },
-          data: ['leave', 'late', 'not arrived', 'average']
+          data: ['leave', 'late', 'not arrived', 'amount']
         },
         calculable: true,
         xAxis: [{
@@ -182,18 +194,18 @@ export default {
             }
           },
           data: [
-            709,
-            117,
-            245,
-            260,
-            179,
-            143,
-            144,
-            325,
-            528,
-            332,
-            244,
-            408
+            3,
+            1,
+            5,
+            2,
+            9,
+            3,
+            4,
+            5,
+            8,
+            3,
+            4,
+            8
           ]
         },
         {
@@ -214,18 +226,18 @@ export default {
             }
           },
           data: [
-            327,
-            177,
-            507,
-            120,
-            800,
-            482,
-            204,
-            139,
-            100,
-            951,
-            381,
-            220
+            2,
+            7,
+            0,
+            1,
+            8,
+            2,
+            4,
+            9,
+            1,
+            1,
+            1,
+            2
           ]
         },
         {
@@ -246,21 +258,21 @@ export default {
             }
           },
           data: [
-            327,
-            177,
-            507,
-            120,
-            800,
-            482,
-            204,
-            130,
-            101,
-            951,
-            381,
-            220
+            7,
+            7,
+            0,
+            0,
+            8,
+            2,
+            4,
+            0,
+            1,
+            1,
+            3,
+            2
           ]
         }, {
-          name: 'average',
+          name: 'amount',
           type: 'line',
           stack: 'total',
           symbolSize: 10,
@@ -279,18 +291,18 @@ export default {
             }
           },
           data: [
-            136,
-            393,
-            292,
-            380,
-            259,
-            195,
-            178,
-            465,
-            629,
-            433,
-            285,
-            428
+            12,
+            15,
+            5,
+            3,
+            25,
+            7,
+            12,
+            14,
+            10,
+            5,
+            8,
+            12
           ]
         }
         ]
