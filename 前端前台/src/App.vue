@@ -31,10 +31,12 @@
 
     </div>
 
+
+
     <div class="content-cam">
       <div class="camera-wrp sec">
         <video width="640" height="480" id="video_cam" preload autoplay loop muted></video>
-        
+
         <canvas width="640" height="480" id="face_detect"></canvas>
         <label v-if="trackTracking" class="checkbox activate-autocapture">
           <input type="checkbox" v-model="autoCaptureTrackTraking"> auto capture is {{autoCaptureTrackTraking ?
@@ -44,8 +46,26 @@
           <div class="btn-wrp">
             <a @click="onTakeCam" class="button is-dark">
               <i class="ion ion-person"></i>
-              <span>{{buttonName}}</span>
+              <span>{{buttonName1}}</span>
             </a>
+          </div>
+
+          <div class="control-btn">
+            <div class="btn-wrp">
+              <a @click="onTakeCam" class="button is-dark">
+                <i class="ion ion-person"></i>
+                <span>{{buttonName2}}</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="control-btn">
+            <div class="btn-wrp">
+              <a @click="EndSign" class="button is-dark">
+                <i class="ion ion-person"></i>
+                <span>{{buttonName3}}</span>
+              </a>
+            </div>
           </div>
 
           <!--
@@ -89,6 +109,8 @@
   import axios from 'axios';
   import cropper from 'cropperjs';
 
+  var beginToSignIn = false;
+  var beginToSignOut = false;
 
   export default {
     name: 'app',
@@ -101,8 +123,11 @@
         leaderConfirm: false,
         username: null,
         showConfList: false,
-        beginToSignIn: false,
-        buttonName: 'Sign In',
+        //beginToSignIn: false,
+        //beginToSignOut: false,
+        buttonName1: 'Sign In',
+        buttonName2: 'Sign Out',
+        buttonName3: 'End Sign In',
         selectedConfs: [],
         confs: {
 
@@ -195,10 +220,10 @@
         }
       },
       onTrackTracking() {
-         const context = this;
+        const context = this;
         const video = this.$el.querySelector('#video_cam');
-         const canvas = this.$el.querySelector('#face_detect');
-         const canvasContext = canvas.getContext('2d');
+        const canvas = this.$el.querySelector('#face_detect');
+        const canvasContext = canvas.getContext('2d');
         let tracker = new tracking.ObjectTracker('face');
 
         video.pause();
@@ -227,70 +252,68 @@
             canvasContext.fillText('x: ' + x + 'px', x + width + 5, y + 11);
             canvasContext.fillText('y: ' + y + 'px', x + width + 5, y + 22);
 
-            //canvasContext.clearRect(0, 0, width, height);
 
-            canvasContext.drawImage(video, x, y, width, height, x, y, width, width);
-            var imageData = canvasContext.getImageData(x, y, width, height);
+            if (beginToSignIn || beginToSignOut) {
+              canvasContext.drawImage(video, x, y, width, height, x, y, width, width);
+              var imageData = canvasContext.getImageData(x, y, width, height);
 
-            var cas = document.createElement('canvas');
-            cas.width = width;
-            cas.height = height;
-            var casContext = cas.getContext('2d');
-            casContext.putImageData(imageData,0,0);
+              var cas = document.createElement('canvas');
+              cas.width = width;
+              cas.height = height;
+              var casContext = cas.getContext('2d');
+              casContext.putImageData(imageData, 0, 0);
 
+              var snapData = cas.toDataURL('image/png');
+              var imgSrc = "data:image/png;" + snapData;
 
-            
-            
-
-            
-
-            //cropper.getCroppedCanvas();
-
-
-
-            var snapData = cas.toDataURL('image/png');
-            var imgSrc = "data:image/png;" + snapData;
-
-            function dataURLtoFile(dataurl, filename) {
-              var arr = dataurl.split(','),
-                mime = arr[0].match(/:(.*?);/)[1],
-                bstr = atob(arr[1]),
-                n = bstr.length,
-                u8arr = new Uint8Array(n);
-              while (n--) {
-                u8arr[n] = bstr.charCodeAt(n);
+              function dataURLtoFile(dataurl, filename) {
+                var arr = dataurl.split(','),
+                  mime = arr[0].match(/:(.*?);/)[1],
+                  bstr = atob(arr[1]),
+                  n = bstr.length,
+                  u8arr = new Uint8Array(n);
+                while (n--) {
+                  u8arr[n] = bstr.charCodeAt(n);
+                }
+                return new File([u8arr], filename, {
+                  type: mime
+                });
               }
-              return new File([u8arr], filename, {
-                type: mime
-              });
+
+              var file = dataURLtoFile(imgSrc, 'try.png');
+
+
+              // let blob = new Blob(this.images, {
+              //   type: "image/png"
+              // });
+              // let file = new File(image, "takenFromCamera.png", {
+              //   type: "DOMString"
+              // });
+
+              // let file = images[0];
+              var formdata1 = new FormData(); // 创建form对象
+              formdata1.append('', file); // 通过append向form对象添加数据,可以通过append继续添加数据或formdata1.append('img',file)
+              let config = {
+
+                headers: {
+                  'enctype': 'multipart/form-data'
+                },
+                processData: false,
+                contentType: false,
+
+              }; //添加请求头
+
+              if (beginToSignIn & !beginToSignOut) {
+                axios.post('http://localhost:4041/api/reco/conf', formdata1, config).then(response => { //这里的/xapi/upimage为接口
+                  console.log(response.data);
+                })
+              } else if (!beginToSignIn & beginToSignOut) {
+                axios.post('http://localhost:4041/api/reco/confEnd', formdata1, config).then(response => { //这里的/xapi/upimage为接口
+                  console.log(response.data);
+                })
+              }
             }
 
-            var file = dataURLtoFile(imgSrc, 'takenFromCamera.png');
-
-
-            // let blob = new Blob(this.images, {
-            //   type: "image/png"
-            // });
-            // let file = new File(image, "takenFromCamera.png", {
-            //   type: "DOMString"
-            // });
-
-            // let file = images[0];
-            var formdata1 = new FormData(); // 创建form对象
-            formdata1.append('', file); // 通过append向form对象添加数据,可以通过append继续添加数据或formdata1.append('img',file)
-            let config = {
-
-              headers: {
-                'enctype': 'multipart/form-data'
-              },
-              processData: false,
-              contentType: false,
-
-            }; //添加请求头
-
-            axios.post('http://localhost:4041/api/reco/user', formdata1, config).then(response => { //这里的/xapi/upimage为接口
-              console.log(response.data);
-            })
 
           });
 
@@ -359,7 +382,11 @@
             });
           }
 
-          if (!this.beginToSignIn) {
+
+
+          if (!beginToSignIn & !beginToSignOut & this.buttonName1 == 'Sign In') {
+            console.log('sign in1:' + beginToSignIn);
+            console.log('sign out1:' + beginToSignOut);
             var file = dataURLtoFile(image, 'takenFromCamera.png');
             var formdata1 = new FormData(); // 创建form对象
             formdata1.append('', file); // 通过append向form对象添加数据,可以通过append继续添加数据或formdata1.append('img',file)
@@ -380,37 +407,78 @@
               // console.log('data: ' + data);
               console.log('response.data[0]data.username: ' + response.data[0].username);
               this.username = response.data[0].username;
+              this.roles = response.data[0].roles;
+              console.log('response.data[0]data.roles: ' + response.data[0].roles);
               this.confs = response.data[0].recentConferences;
               console.log(this.confs);
               this.showConfList = true;
               console.log(this.showConfList);
-              // 获取弹窗
-              var modal = document.getElementById('myModal');
-              // 打开弹窗的条件为真
-              var btn = document.getElementById("myBtn");
-              if (this.showConfList) {
-                modal.style.display = "block";
-              }
-              // 获取 <span> 元素，用于关闭弹窗 that closes the modal
-              var span = document.getElementsByClassName("close")[0];
-              // 点击 <span> (x), 关闭弹窗
-              span.onclick = function () {
-                modal.style.display = "none";
-              }
 
-              // 在用户点击其他地方时，关闭弹窗
-              window.onclick = function (event) {
-                if (event.target == modal) {
+              if (this.roles == 'admin') {
+                // 获取弹窗
+                var modal = document.getElementById('myModal');
+                // 打开弹窗的条件为真
+                var btn = document.getElementById("myBtn");
+                if (this.showConfList) {
+                  modal.style.display = "block";
+                }
+                // 获取 <span> 元素，用于关闭弹窗 that closes the modal
+                var span = document.getElementsByClassName("close")[0];
+                // 点击 <span> (x), 关闭弹窗
+                span.onclick = function () {
                   modal.style.display = "none";
+                }
+
+                // 在用户点击其他地方时，关闭弹窗
+                window.onclick = function (event) {
+                  if (event.target == modal) {
+                    modal.style.display = "none";
+                  }
                 }
               }
 
             })
 
-          } else {
+          }
+
+          // else if (this.beginToSignIn & !this.beginToSignOut) {
+          //   console.log('sign in2:' + this.beginToSignIn);
+          //   console.log('sign out2:' + this.beginToSignOut);
+          //   var file = dataURLtoFile(image, 'takenFromCamera.png');
+          //   var formdata1 = new FormData(); // 创建form对象
+          //   formdata1.append('id', this.selectedConfs[0]);
+          //   formdata1.append('', file); // 通过append向form对象添加数据,可以通过append继续添加数据或formdata1.append('img',file)
+          //   let config = {
+
+          //     headers: {
+          //       'enctype': 'multipart/form-data'
+          //     },
+          //     processData: false,
+          //     contentType: false,
+
+          //   }; //添加请求头
+          //   axios.post('http://localhost:4041/api/reco/conf', formdata1, config).then(response => { //这里的/xapi/upimage为接口
+          //     console.log(response.data);
+          //   })
+
+
+          // } 
+          else if (!beginToSignIn & !beginToSignOut & this.buttonName3 == 'Done') {
+            console.log('sign in3:' + beginToSignIn);
+            console.log('sign out3:' + beginToSignOut);
+
+
+            console.log("hhh");
+            this.buttonName2 = 'Done';
+            beginToSignOut = true;
+
+            console.log('sign in2.5:' + beginToSignIn);
+            console.log('sign out2.5:' + beginToSignOut);
+
+
+
             var file = dataURLtoFile(image, 'takenFromCamera.png');
             var formdata1 = new FormData(); // 创建form对象
-            formdata1.append('id', this.selectedConfs[0]);
             formdata1.append('', file); // 通过append向form对象添加数据,可以通过append继续添加数据或formdata1.append('img',file)
             let config = {
 
@@ -421,8 +489,21 @@
               contentType: false,
 
             }; //添加请求头
-            axios.post('http://localhost:4041/api/reco/conf', formdata1, config).then(response => { //这里的/xapi/upimage为接口
+
+            axios.post('http://localhost:4041/api/reco/user', formdata1, config).then(response => { //这里的/xapi/upimage为接口
               console.log(response.data);
+              console.log('shit')
+              // const data = response.data;
+              // console.log('data: ' + data);
+              console.log('response.data[0]data.username: ' + response.data[0].username);
+              this.username = response.data[0].username;
+              //this.roles = response.data[0].roles;
+              //console.log('response.data[0]data.roles: ' + response.data[0].roles);
+              this.confs = response.data[0].recentConferences;
+              console.log(this.confs);
+              console.log('hoping for the next meeting with you');
+              //this.showConfList = true;
+              //console.log(this.showConfList);
             })
           }
 
@@ -456,19 +537,35 @@
         };
       },
       SignBegin() {
-        console.log(this.beginToSignIn);
+        console.log(beginToSignIn);
 
         console.log("here");
-        this.buttonName = 'Attendance';
-        this.beginToSignIn = true;
+        this.buttonName1 = 'Done';
+        beginToSignIn = true;
         console.log(this.selectedConfs[0]);
         var modal = document.getElementById('myModal');
         modal.style.display = "none";
 
+      },
+      EndSign() {
+        console.log("hhh");
 
+        this.buttonName3 = 'Done';
+        beginToSignIn = false;
+
+      },
+      SignEnd() {
+        console.log(beginToSignOut);
+        console.log("hhh");
+        this.buttonName2 = 'Done';
+        beginToSignOut = true;
+
+        console.log('sign in2.5:' + beginToSignIn);
+        console.log('sign out2.5:' + beginToSignOut);
 
 
       }
+
     }
   }
 
