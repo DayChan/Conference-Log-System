@@ -31,6 +31,28 @@
 
     </div>
 
+    <div id="tanchuang1" class="modal" style="display: none">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="close">&times;</span>
+          <h1>{{username}}签到成功</h1>
+          <div align="center">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tanchuang2" class="modal" style="display: none">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="close">&times;</span>
+          <h1>{{username}}再见</h1>
+          <div align="center">
+          </div>
+        </div>
+      </div>
+    </div>
+
 
 
     <div class="content-cam">
@@ -42,28 +64,31 @@
           <input type="checkbox" v-model="autoCaptureTrackTraking"> auto capture is {{autoCaptureTrackTraking ?
           'activated' : 'not activated'}}
         </label>
-        <div class="control-btn">
-          <div class="btn-wrp">
-            <a @click="onTakeCam" class="button is-dark">
-              <i class="ion ion-person"></i>
+
+        <div class="control-btn" style="margin-left: 10%;">
+          <div class="btn-wrp" style="margin-left: 10%;">
+            <a @click="onTakeCam" class="button is-dark" style="margin-left: 10%;">
+              <i class="ion ion-person" style="margin-left: 10%;"> </i>
               <span>{{buttonName1}}</span>
             </a>
           </div>
 
-          <div class="control-btn">
-            <div class="btn-wrp">
-              <a @click="onTakeCam" class="button is-dark">
-                <i class="ion ion-person"></i>
-                <span>{{buttonName2}}</span>
+
+
+          <div class="control-btn" style="margin-left: 5%;">
+            <div class="btn-wrp" style="margin-left: 5%;">
+              <a @click="EndSign" class="button is-dark" style="margin-left: 5%;">
+                <i class="ion ion-person" style="margin-left: 5%;"></i>
+                <span>{{buttonName3}}</span>
               </a>
             </div>
           </div>
 
-          <div class="control-btn">
-            <div class="btn-wrp">
-              <a @click="EndSign" class="button is-dark">
-                <i class="ion ion-person"></i>
-                <span>{{buttonName3}}</span>
+          <div class="control-btn" style="margin-right: 10%;">
+            <div class="btn-wrp" style="margin-right: 10%;">
+              <a @click="onTakeCam" class="button is-dark" style="margin-right: 10%;">
+                <i class="ion ion-person" style="margin-right: 10%;"></i>
+                <span>{{buttonName2}}</span>
               </a>
             </div>
           </div>
@@ -107,7 +132,7 @@
     isEmpty
   } from 'lodash';
   import axios from 'axios';
-  import cropper from 'cropperjs';
+  //import cropper from 'cropperjs';
 
   var beginToSignIn = false;
   var beginToSignOut = false;
@@ -125,9 +150,9 @@
         showConfList: false,
         //beginToSignIn: false,
         //beginToSignOut: false,
-        buttonName1: 'Sign In',
-        buttonName2: 'Sign Out',
-        buttonName3: 'End Sign In',
+        buttonName1: '开始签到',
+        buttonName2: '退场签到',
+        buttonName3: '结束签到',
         selectedConfs: [],
         confs: {
 
@@ -220,6 +245,8 @@
         }
       },
       onTrackTracking() {
+        var that = this;
+        console.log("selectedconf: ", that.selectedConfs);
         const context = this;
         const video = this.$el.querySelector('#video_cam');
         const canvas = this.$el.querySelector('#face_detect');
@@ -253,6 +280,7 @@
             canvasContext.fillText('y: ' + y + 'px', x + width + 5, y + 22);
 
 
+            //员工进退场自动刷脸
             if (beginToSignIn || beginToSignOut) {
               canvasContext.drawImage(video, x, y, width, height, x, y, width, width);
               var imageData = canvasContext.getImageData(x, y, width, height);
@@ -280,7 +308,7 @@
                 });
               }
 
-              var file = dataURLtoFile(imgSrc, 'try.png');
+              var file = dataURLtoFile(imgSrc, 'takenFromCamera.png');
 
 
               // let blob = new Blob(this.images, {
@@ -292,6 +320,7 @@
 
               // let file = images[0];
               var formdata1 = new FormData(); // 创建form对象
+              formdata1.append('id', that.selectedConfs[0]);
               formdata1.append('', file); // 通过append向form对象添加数据,可以通过append继续添加数据或formdata1.append('img',file)
               let config = {
 
@@ -303,13 +332,43 @@
 
               }; //添加请求头
 
+
+              //进场刷脸
               if (beginToSignIn & !beginToSignOut) {
                 axios.post('http://localhost:4041/api/reco/conf', formdata1, config).then(response => { //这里的/xapi/upimage为接口
                   console.log(response.data);
+                  that.username = response.data[0].username;
+
+                  var modal1 = document.getElementById('tanchuang1');
+                  modal1.style.display = "block";
+                  console.log('modal1');
+
+                  function display() {
+                    modal1.style.display = "none"
+                  }
+
+                  setTimeout(display, 3000);
+
+
                 })
-              } else if (!beginToSignIn & beginToSignOut) {
+              }
+
+              //退场刷脸
+              else if (!beginToSignIn & beginToSignOut) {
                 axios.post('http://localhost:4041/api/reco/confEnd', formdata1, config).then(response => { //这里的/xapi/upimage为接口
                   console.log(response.data);
+
+                  that.username = response.data[0].username;
+
+                  var modal1 = document.getElementById('tanchuang2');
+                  modal1.style.display = "block";
+                  console.log('modal1');
+
+                  function display() {
+                    modal1.style.display = "none"
+                  }
+
+                  setTimeout(display, 3000);
                 })
               }
             }
@@ -383,8 +442,8 @@
           }
 
 
-
-          if (!beginToSignIn & !beginToSignOut & this.buttonName1 == 'Sign In') {
+          //管理员的两次刷脸，要点按钮拍照
+          if (!beginToSignIn & !beginToSignOut & this.buttonName1 == '开始签到') {
             console.log('sign in1:' + beginToSignIn);
             console.log('sign out1:' + beginToSignOut);
             var file = dataURLtoFile(image, 'takenFromCamera.png');
@@ -400,6 +459,7 @@
 
             }; //添加请求头
 
+            
             axios.post('http://localhost:4041/api/reco/user', formdata1, config).then(response => { //这里的/xapi/upimage为接口
               console.log(response.data);
               console.log('fuck')
@@ -414,6 +474,8 @@
               this.showConfList = true;
               console.log(this.showConfList);
 
+
+
               if (this.roles == 'admin') {
                 // 获取弹窗
                 var modal = document.getElementById('myModal');
@@ -422,6 +484,7 @@
                 if (this.showConfList) {
                   modal.style.display = "block";
                 }
+               
                 // 获取 <span> 元素，用于关闭弹窗 that closes the modal
                 var span = document.getElementsByClassName("close")[0];
                 // 点击 <span> (x), 关闭弹窗
@@ -468,12 +531,13 @@
             console.log('sign out3:' + beginToSignOut);
 
 
-            console.log("hhh");
-            this.buttonName2 = 'Done';
+            //console.log("hhh");
+
+            //this.buttonName2 = '入场签到结束';
             beginToSignOut = true;
 
-            console.log('sign in2.5:' + beginToSignIn);
-            console.log('sign out2.5:' + beginToSignOut);
+            //console.log('sign in2.5:' + beginToSignIn);
+            //console.log('sign out2.5:' + beginToSignOut);
 
 
 
@@ -540,7 +604,7 @@
         console.log(beginToSignIn);
 
         console.log("here");
-        this.buttonName1 = 'Done';
+        this.buttonName1 = '入场签到中';
         beginToSignIn = true;
         console.log(this.selectedConfs[0]);
         var modal = document.getElementById('myModal');
@@ -548,9 +612,10 @@
 
       },
       EndSign() {
-        console.log("hhh");
+        console.log("zzz");
 
         this.buttonName3 = 'Done';
+        this.buttonName1 = '入场签到已结束';
         beginToSignIn = false;
 
       },
