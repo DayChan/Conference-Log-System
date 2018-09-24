@@ -328,7 +328,7 @@ function handlePicsByConf(req, res, next) {
                           Conf.update({ id: fieldid }, { $addToSet: { attendedStaff: {user_name, timeNow} } }, function(err) {
                             if (err) {
                               console.log(err);
-                              }
+                              }else {res.send(200);}
                             }); 
                           /* 
                           console.log('5');
