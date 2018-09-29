@@ -549,7 +549,7 @@ function handlePicsByConfEnd(req, res, next) {
                             if (err) {
                               console.log(err);
                               } else {res.json(user);}
-                            });
+                           });
                           console.log("done left");
                           
                           }).catch(e => next(e));
